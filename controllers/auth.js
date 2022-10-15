@@ -2,6 +2,10 @@ const passport = require("passport");
 const validator = require("validator");
 const User = require("../models/User");
 
+exports.getUser = (req, res) => {
+  res.json({ user: req.user || null });
+};
+
 exports.getLogin = (req, res) => {
   if (req.user) {
     return res.redirect("/profile");
@@ -20,7 +24,7 @@ exports.postLogin = (req, res, next) => {
 
   if (validationErrors.length) {
     req.flash("errors", validationErrors);
-    return res.redirect("/login");
+    return res.json({ messages: req.flash() });
   }
   req.body.email = validator.normalizeEmail(req.body.email, {
     gmail_remove_dots: false,
@@ -32,14 +36,14 @@ exports.postLogin = (req, res, next) => {
     }
     if (!user) {
       req.flash("errors", info);
-      return res.redirect("/login");
+      return res.json({ messages: req.flash() });
     }
     req.logIn(user, (err) => {
       if (err) {
         return next(err);
       }
       req.flash("success", { msg: "Success! You are logged in." });
-      res.redirect(req.session.returnTo || "/profile");
+      res.json({ user, messages: req.flash() });
     });
   })(req, res, next);
 };
@@ -78,7 +82,7 @@ exports.postSignup = (req, res, next) => {
 
   if (validationErrors.length) {
     req.flash("errors", validationErrors);
-    return res.redirect("../signup");
+    return res.json({ messages: req.flash() });
   }
   req.body.email = validator.normalizeEmail(req.body.email, {
     gmail_remove_dots: false,
@@ -100,7 +104,7 @@ exports.postSignup = (req, res, next) => {
         req.flash("errors", {
           msg: "Account with that email address or username already exists.",
         });
-        return res.redirect("../signup");
+        return res.json({ messages: req.flash() });
       }
       user.save((err) => {
         if (err) {
@@ -110,7 +114,7 @@ exports.postSignup = (req, res, next) => {
           if (err) {
             return next(err);
           }
-          res.redirect("/profile");
+          res.json({ user, messages: req.flash() });
         });
       });
     }

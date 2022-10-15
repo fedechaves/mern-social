@@ -5,7 +5,7 @@ module.exports = {
   getProfile: async (req, res) => {
     try {
       const posts = await Post.find({ user: req.user.id }).lean();
-      res.render("profile", { posts: posts, user: req.user });
+      res.json(posts);
     } catch (err) {
       console.log(err);
     }
@@ -13,7 +13,7 @@ module.exports = {
   getFeed: async (req, res) => {
     try {
       const posts = await Post.find().sort({ createdAt: "desc" }).lean();
-      res.render("feed", { posts: posts });
+      res.json(posts);
     } catch (err) {
       console.log(err);
     }
@@ -21,7 +21,7 @@ module.exports = {
   getPost: async (req, res) => {
     try {
       const post = await Post.findById(req.params.id);
-      res.render("post", { post: post, user: req.user });
+      res.json({ post: post || null });
     } catch (err) {
       console.log(err);
     }
@@ -31,7 +31,7 @@ module.exports = {
       // Upload image to cloudinary
       const result = await cloudinary.uploader.upload(req.file.path);
 
-      await Post.create({
+      const post = await Post.create({
         title: req.body.title,
         image: result.secure_url,
         cloudinaryId: result.public_id,
@@ -40,21 +40,22 @@ module.exports = {
         user: req.user.id,
       });
       console.log("Post has been added!");
-      res.redirect("/profile");
+      res.json({ post });
     } catch (err) {
       console.log(err);
     }
   },
   likePost: async (req, res) => {
     try {
-      await Post.findOneAndUpdate(
+      const post = await Post.findOneAndUpdate(
         { _id: req.params.id },
         {
           $inc: { likes: 1 },
-        }
+        },
+        { new: true }
       );
       console.log("Likes +1");
-      res.redirect(`/post/${req.params.id}`);
+      res.json(post.likes);
     } catch (err) {
       console.log(err);
     }

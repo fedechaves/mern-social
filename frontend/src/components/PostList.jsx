@@ -1,4 +1,3 @@
-import React from 'react';
 import PostPreview from './PostPreview';
 
 const PostList = ({ posts }) => <ul className="row list-unstyled">
