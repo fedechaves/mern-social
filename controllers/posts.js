@@ -4,7 +4,7 @@ const Post = require("../models/Post");
 module.exports = {
   getProfile: async (req, res) => {
     try {
-      const posts = await Post.find({ user: req.user.id });
+      const posts = await Post.find({ user: req.user.id }).lean();
       res.render("profile", { posts: posts, user: req.user });
     } catch (err) {
       console.log(err);
