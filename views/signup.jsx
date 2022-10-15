@@ -1,5 +1,6 @@
 import React from 'react';
 import Main from './components/Main.jsx';
+import Messages from './components/Messages.jsx';
 
 export default function Signup({ messages }) {
 	return (
@@ -7,15 +8,7 @@ export default function Signup({ messages }) {
 			<main class="container">
 				<div class="row justify-content-center">
 					<section class="col-6 mt-5">
-						{messages.errors && messages.errors.map((el, i) =>
-							<div key={i} className="alert alert-danger">{el.msg}</div>
-						)}
-						{messages.info
-							? messages.info.map((el, i) =>
-								<div key={i} className="alert alert-danger">{el.msg}</div>
-							)
-							: null
-						}
+						<Messages messages={messages} />
 						<form action="/signup" method="POST">
 							<div class="mb-3">
 								<label for="userName" class="form-label">User Name</label>
