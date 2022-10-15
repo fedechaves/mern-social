@@ -6,15 +6,6 @@ exports.getUser = (req, res) => {
   res.json({ user: req.user || null });
 };
 
-exports.getLogin = (req, res) => {
-  if (req.user) {
-    return res.redirect("/profile");
-  }
-  res.render("login", {
-    title: "Login",
-  });
-};
-
 exports.postLogin = (req, res, next) => {
   const validationErrors = [];
   if (!validator.isEmail(req.body.email))
@@ -60,14 +51,6 @@ exports.logout = (req, res) => {
   });
 };
 
-exports.getSignup = (req, res) => {
-  if (req.user) {
-    return res.redirect("/profile");
-  }
-  res.render("signup", {
-    title: "Create Account",
-  });
-};
 
 exports.postSignup = (req, res, next) => {
   const validationErrors = [];
