@@ -1,15 +1,15 @@
 import React from 'react';
 import Main from './components/Main.jsx';
 
-export default function Profile(props) {
+export default function Profile({ user, posts }) {
 	return (
 		<Main>
 			<div class="container">
 				<div class="row mt-5">
 					<div class="col-6">
 						<div>
-							<p><strong>User Name</strong>: {props.user.userName}</p>
-							<p><strong>Email</strong>: {props.user.email}</p>
+							<p><strong>User Name</strong>: {user.userName}</p>
+							<p><strong>Email</strong>: {user.email}</p>
 							<a href="/logout" class="col-3 btn btn-primary">Logout</a>
 						</div>
 						<div class="mt-5">
@@ -33,7 +33,7 @@ export default function Profile(props) {
 					</div>
 					<div class="col-6">
 						<ul class="row list-unstyled">
-							{props.posts.map(post =>
+							{posts.map(post =>
 								<li className="col-6 justify-content-between mt-5">
 									<a href={`/post/${post._id}`}>
 										<img class="img-fluid" src={post.image} />

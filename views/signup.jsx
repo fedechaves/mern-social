@@ -1,17 +1,17 @@
 import React from 'react';
 import Main from './components/Main.jsx';
 
-export default function Signup(props) {
+export default function Signup({ messages }) {
 	return (
 		<Main>
 			<main class="container">
 				<div class="row justify-content-center">
 					<section class="col-6 mt-5">
-						{props.messages.errors && props.messages.errors.map((el, i) =>
+						{messages.errors && messages.errors.map((el, i) =>
 							<div key={i} className="alert alert-danger">{el.msg}</div>
 						)}
-						{props.messages.info
-							? props.messages.info.map((el, i) =>
+						{messages.info
+							? messages.info.map((el, i) =>
 								<div key={i} className="alert alert-danger">{el.msg}</div>
 							)
 							: null
