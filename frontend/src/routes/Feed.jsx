@@ -1,11 +1,12 @@
 import { useEffect, useState } from "react";
 import PostList from "../components/PostList";
+import { API_BASE } from "../constants";
 
 export default function Feed() {
 	const [posts, setPosts] = useState([]);
 
 	useEffect(() => {
-		fetch("/api/feed")
+		fetch(API_BASE + "/api/feed", { credentials: "include" })
 			.then((res) => res.json())
 			.then((data) => setPosts(data));
 	}, []);

@@ -1,4 +1,5 @@
 import { useNavigate, useOutletContext } from "react-router-dom";
+import { API_BASE } from "../constants";
 
 export default function Signup() {
 	const { setUser, setMessages } = useOutletContext();
@@ -7,9 +8,10 @@ export default function Signup() {
 	const handleSubmit = async (event) => {
 		event.preventDefault();
 		const form = event.currentTarget;
-		const response = await fetch(form.action, {
+		const response = await fetch(API_BASE + form.getAttribute('action'), {
 			method: form.method,
-			body: new URLSearchParams(new FormData(form))
+			body: new URLSearchParams(new FormData(form)),
+			credentials: "include"
 		});
 		const json = await response.json();
 		if (json.messages) setMessages(json.messages);

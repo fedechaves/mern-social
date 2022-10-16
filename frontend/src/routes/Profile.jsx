@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { Link, useOutletContext } from "react-router-dom";
 import PostList from "../components/PostList";
+import { API_BASE } from "../constants";
 
 export function Profile() {
 	const { user, setMessages } = useOutletContext();
@@ -8,7 +9,7 @@ export function Profile() {
 	const [posts, setPosts] = useState([]);
 
 	useEffect(() => {
-		fetch("/api/profile")
+		fetch(API_BASE + "/api/profile", { credentials: "include" })
 			.then((res) => res.json())
 			.then((data) => setPosts(data));
 	}, []);
@@ -18,9 +19,10 @@ export function Profile() {
 	const handleSubmit = async (event) => {
 		event.preventDefault();
 		const form = event.currentTarget;
-		const response = await fetch(form.action, {
+		const response = await fetch(API_BASE + form.getAttribute('action'), {
 			method: form.method,
-			body: new FormData(form)
+			body: new FormData(form),
+			credentials: "include"
 		});
 		const json = await response.json();
 		if (json.messages) setMessages(json.messages);

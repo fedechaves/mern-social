@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { Link, useNavigate, useOutletContext, useParams } from "react-router-dom";
+import { API_BASE } from "../constants";
 
 export default function Post() {
 	const { user } = useOutletContext();
@@ -8,7 +9,7 @@ export default function Post() {
 
 	const [post, setPost] = useState();
 	useEffect(() => {
-		fetch(`/api/post/${postId}`)
+		fetch(API_BASE + `/api/post/${postId}`, { credentials: "include" })
 			.then((res) => res.json())
 			.then(({ post }) => setPost(post));
 	}, [setPost, postId]);
@@ -19,8 +20,9 @@ export default function Post() {
 	const handleLike = async (event) => {
 		event.preventDefault();
 		const form = event.currentTarget;
-		const response = await fetch(form.action, {
-			method: form.method
+		const response = await fetch(API_BASE + form.getAttribute('action'), {
+			method: form.method,
+			credentials: "include"
 		});
 		const likes = await response.json();
 		setPost({ ...post, likes });
@@ -29,8 +31,9 @@ export default function Post() {
 	const handleDelete = async (event) => {
 		event.preventDefault();
 		const form = event.currentTarget;
-		await fetch(form.action, {
-			method: form.method
+		await fetch(API_BASE + form.getAttribute('action'), {
+			method: form.method,
+			credentials: "include"
 		});
 		navigate(-1);
 	};
