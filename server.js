@@ -12,7 +12,7 @@ const cors = require("cors");
 const connectDB = require("./config/database");
 const mainRoutes = require("./routes/main");
 const postRoutes = require("./routes/posts");
-const commentRoutes = require("./routes/comment");
+const commentRoutes = require("./routes/comments");
 
 //Use .env file in config folder
 require("dotenv").config({ path: "./config/.env" });

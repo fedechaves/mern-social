@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { Link, useNavigate, useOutletContext, useParams } from "react-router-dom";
 import { API_BASE } from "../constants";
+import Comment from '../components/Comment'
 
 export default function Post() {
 	const { user } = useOutletContext();
@@ -19,6 +20,8 @@ export default function Post() {
 			});
 	}, [setPost, postId]);
 
+	if (!user) return null;
+
 	if (post === undefined) return null;
 	else if (post === null) return <h2>Post not found</h2>;
 
@@ -29,8 +32,8 @@ export default function Post() {
 			method: form.method,
 			credentials: "include"
 		});
-		const likes = await response.json();
-		setPost({ ...post, likes });
+		const change = await response.json();
+		setPost({ ...post, likes: post.likes + change });
 	};
 
 	const handleDelete = async (event) => {
@@ -53,7 +56,98 @@ export default function Post() {
 		});
 		const comment = await response.json();
 		setComments([...comments, comment]);
+		form.reset();
 	};
+
+	const deleteComment = async (id, event) => {
+		const newComments = JSON.parse(JSON.stringify(comments));
+		const commentArrays = new Map();
+		for (const comment of newComments) commentArrays.set(comment.id, newComments);
+
+		const queue = [...newComments];
+		while (queue.length) {
+			const comment = queue.shift();
+			if (comment.id === id) {
+
+				event.preventDefault();
+				const form = event.currentTarget;
+				const response = await fetch(API_BASE + form.getAttribute('action'), {
+					method: form.method,
+					body: new URLSearchParams(new FormData(form)),
+					credentials: "include"
+				});
+				const deletedComment = await response.json();
+				if (deletedComment) {
+					Object.assign(comment, deletedComment);
+				} else {
+					const array = commentArrays.get(comment.id);
+					array.splice(array.indexOf(comment), 1);
+				}
+				break;
+			}
+			for (const subComment of comment.comments) {
+				queue.push(subComment);
+				commentArrays.set(subComment.id, comment.comments);
+			}
+		}
+
+		setComments(newComments);
+	}
+
+	const updateComment = async (id, event) => {
+		const newComments = JSON.parse(JSON.stringify(comments));
+
+		const queue = [...newComments];
+		while (queue.length) {
+			const comment = queue.shift();
+			if (comment.id === id) {
+				event.preventDefault();
+				const form = event.currentTarget;
+				const response = await fetch(API_BASE + form.getAttribute('action'), {
+					method: form.method,
+					body: new URLSearchParams(new FormData(form)),
+					credentials: "include"
+				});
+				Object.assign(comment, await response.json());
+				form.querySelector('[data-bs-dismiss]').click();
+				break;
+			}
+			for (const subComment of comment.comments) {
+				queue.push(subComment);
+			}
+		}
+
+		setComments(newComments);
+	}
+
+
+	const addComment = async (id, event) => {
+		const newComments = JSON.parse(JSON.stringify(comments));
+
+		const queue = [...newComments];
+		while (queue.length) {
+			const comment = queue.shift();
+			if (comment.id === id) {
+				event.preventDefault();
+				const form = event.currentTarget;
+				const response = await fetch(API_BASE + form.getAttribute('action'), {
+					method: form.method,
+					body: new URLSearchParams(new FormData(form)),
+					credentials: "include"
+				});
+				const newComment = await response.json()
+				comment.comments.push(newComment);
+				form.closest('.accordion').querySelector('button').click();
+				form.reset();
+				break;
+			}
+			for (const subComment of comment.comments) {
+				queue.push(subComment);
+			}
+		}
+
+		setComments(newComments);
+	}
 
 	return (
 		<div className="container">
@@ -90,17 +184,25 @@ export default function Post() {
 					<h2>Add a comment</h2>
 					<form action={'/api/comment/createComment/' + post._id} method="POST" onSubmit={handleAddComment}>
 						<div className="mb-3">
-							<label for="comment" className="form-label">Comment</label>
-							<textarea className="form-control" id="comment" name="comment"></textarea>
+							<label htmlFor="text" className="form-label">Comment</label>
+							<textarea className="form-control" id="text" name="text"></textarea>
 						</div>
 						<button type="submit" className="btn btn-primary" value="Upload">Submit</button>
 					</form>
 				</div>
 				<ul>
 					{comments.map((comment) => (
-						<li key={comment._id} class="col-6 justify-content-between mt-5">
-							<p>{comment.comment}</p>
-						</li>
+						<Comment
+							key={comment._id}
+							comment={comment}
+							depth={0}
+
+							postId={post._id}
+							userId={user._id}
+							deleteComment={deleteComment}
+							updateComment={updateComment}
+							addComment={addComment}
+						/>
 					))}
 				</ul>
 				<div className="col-6 mt-5">

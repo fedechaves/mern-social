@@ -1,22 +1,35 @@
 const mongoose = require("mongoose");
 
 const CommentSchema = new mongoose.Schema({
-  comment: {
-    type: String,
-    required: true,
+  text: {
+    type: String
   },
-  likes: {
-    type: Number,
+  user: {
+    type: mongoose.Schema.Types.ObjectId,
     required: true,
+    ref: "User",
+    autopopulate: true
   },
   post: {
     type: mongoose.Schema.Types.ObjectId,
     ref: "Post",
   },
-  createdAt: {
-    type: Date,
-    default: Date.now,
+  comment: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "Comment",
   },
+  deleted: { type: Boolean },
+  edited: { type: Boolean }
+}, {
+  toObject: { virtuals: true }
 });
+CommentSchema.virtual('comments', {
+  ref: 'Comment',
+  localField: '_id',
+  foreignField: 'comment',
+  autopopulate: true
+});
+
+CommentSchema.plugin(require('mongoose-autopopulate'));
 
 module.exports = mongoose.model("Comment", CommentSchema);
