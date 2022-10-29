@@ -8,10 +8,15 @@ export default function Post() {
 	const navigate = useNavigate();
 
 	const [post, setPost] = useState();
+	const [comments, setComments] = useState([]);
+
 	useEffect(() => {
 		fetch(API_BASE + `/api/post/${postId}`, { credentials: "include" })
 			.then((res) => res.json())
-			.then(({ post }) => setPost(post));
+			.then(({ post, comments }) => {
+				setPost(post);
+				setComments(comments);
+			});
 	}, [setPost, postId]);
 
 	if (post === undefined) return null;
@@ -36,6 +41,18 @@ export default function Post() {
 			credentials: "include"
 		});
 		navigate(-1);
+	};
+
+	const handleAddComment = async (event) => {
+		event.preventDefault();
+		const form = event.currentTarget;
+		const response = await fetch(API_BASE + form.getAttribute('action'), {
+			method: form.method,
+			body: new URLSearchParams(new FormData(form)),
+			credentials: "include"
+		});
+		const comment = await response.json();
+		setComments([...comments, comment]);
 	};
 
 	return (
@@ -69,6 +86,23 @@ export default function Post() {
 				<div className="col-3 mt-5">
 					<p>{post.caption}</p>
 				</div>
+				<div className="mt-5">
+					<h2>Add a comment</h2>
+					<form action={'/api/comment/createComment/' + post._id} method="POST" onSubmit={handleAddComment}>
+						<div className="mb-3">
+							<label for="comment" className="form-label">Comment</label>
+							<textarea className="form-control" id="comment" name="comment"></textarea>
+						</div>
+						<button type="submit" className="btn btn-primary" value="Upload">Submit</button>
+					</form>
+				</div>
+				<ul>
+					{comments.map((comment) => (
+						<li key={comment._id} class="col-6 justify-content-between mt-5">
+							<p>{comment.comment}</p>
+						</li>
+					))}
+				</ul>
 				<div className="col-6 mt-5">
 					<Link className="btn btn-primary" to="/profile">Return to Profile</Link>
 					<Link className="btn btn-primary" to="/feed">Return to Feed</Link>
