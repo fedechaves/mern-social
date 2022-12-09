@@ -28,8 +28,8 @@ export default function Root() {
     <>
       <header className="container">
         <div className="text-center">
-          <h1 className=""><Link to={user ? '/profile' : '/'}>Binary Upload Boom</Link></h1>
-          <span>The #100Devs Social Network</span>
+          <h1 className=""><Link to={user ? '/profile' : '/'}>test</Link></h1>
+          <span>test</span>
         </div>
       </header>
 			<Messages messages={messages} />
